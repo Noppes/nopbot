@@ -8,12 +8,12 @@ async def handle(message: discord.Message):
         result = urbandict(msg)
         if result:
             embed = discord.Embed(
-                title = result['word'],
-                description = result['definition'].replace("[", "").replace("]", ""),
+                title = "Urban Dictionary: " + result['word'].capitalize(),
                 timestamp = datetime.strptime(result['written_on'], "%Y-%m-%dT%H:%M:%S.%fZ") ,
                 url = result['permalink']
             )
-            embed.add_field(name="Example", value=result['example'].replace("[", "").replace("]", ""))
+            embed.add_field(name="Definition",  value=result['definition'].replace("[", "").replace("]", ""), inline=False)
+            embed.add_field(name="Example",     value=result['example'].replace("[", "").replace("]", ""), inline=False)
             await message.channel.send(embed=embed) 
             return True
         result = urbandict_autocomplete(msg)

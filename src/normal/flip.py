@@ -59,11 +59,11 @@ def findWholeWord(w):
 
 async def handle(message: discord.Message):
     if message.content == u"(╯°□°)╯︵ ┻━┻":
-        await message.channel.send(u"(╯°□°)╯︵ " + transform(message.author.name))        
+        await message.channel.send(u"(╯°□°)╯︵ " + transform(message.author.display_name))        
         return True
         
     msg = message.content.lower().strip()
-    if not msg.startswith("flip "):
+    if not msg.startswith("flip ") and not msg.startswith("!flip "):
         return False
 	
     s = message.content[5:].strip()	

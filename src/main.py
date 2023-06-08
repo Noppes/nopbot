@@ -6,7 +6,7 @@ import sys
 import asyncio
 import logging
 from normal import shouldi, flip, cat
-from commands import anagram, urbandict
+from commands import anagram, urbandict, choose, dict_
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,7 +21,7 @@ logger.addHandler(consoleHandler)
 client = discord.Client(intents=intents)
 cache = util.CachedMessages()
 
-handlers = [shouldi, flip, cat, urbandict, anagram]
+handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -40,7 +40,7 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
         return
 
     embed = discord.Embed(
-        title = "Message Deleted",
+        title = "Message Deleted from #" + client.get_channel(payload.channel_id).name ,
         description = message.content,
         color = discord.Color.red(),
         timestamp = message.created_at
