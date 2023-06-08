@@ -6,6 +6,7 @@ import sys
 import asyncio
 import logging
 from normal import shouldi, flip, cat
+from commands import anagram, urbandict
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -19,6 +20,8 @@ logger.addHandler(consoleHandler)
 
 client = discord.Client(intents=intents)
 cache = util.CachedMessages()
+
+handlers = [shouldi, flip, cat, urbandict, anagram]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -42,7 +45,7 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
         color = discord.Color.red(),
         timestamp = message.created_at
     )
-    embed.set_author(name=message.author.name + f" (ID: {message.author.id})", icon_url=message.author.avatar.url, url=after.author.avatar.url)
+    embed.set_author(name=message.author.name + f" (ID: {message.author.id})", icon_url=message.author.avatar.url, url=message.author.avatar.url)
     embed.timestamp = message.created_at
     if(message.author.id != message.author.id):
         responsible_user = client.get_user(payload.cached_message.author.id)
@@ -81,9 +84,9 @@ async def on_message(message: discord.Message):
         return
     cache.cache_message(message.channel.id, message)
 
-    await shouldi.handle(message)
-    await flip.handle(message)
-    await cat.handle(message)
+    for handler in handlers:
+        if await handler.handle(message):
+            return
     
     #if message.content.startswith('hello'):
     #    await message.channel.send('Hello!')

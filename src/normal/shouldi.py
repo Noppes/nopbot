@@ -1,6 +1,6 @@
 import discord
 from random import randint
-keywords = ("should ", "will ", "do ", "am i ", "does ", "are ", "did ")
+keywords = ("should ", "will ", "do ", "am i ", "does ", "are ", "did ", "is ")
 
 async def handle(message: discord.Message):
     msg = message.content.lower().strip()
@@ -18,3 +18,5 @@ async def handle(message: discord.Message):
             await message.channel.send("Definitely")
         elif i == 5:
             await message.channel.send("Definitely not")
+        return True
+    return False

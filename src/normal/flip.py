@@ -60,16 +60,17 @@ def findWholeWord(w):
 async def handle(message: discord.Message):
     if message.content == u"(╯°□°)╯︵ ┻━┻":
         await message.channel.send(u"(╯°□°)╯︵ " + transform(message.author.name))        
-        return
+        return True
         
     msg = message.content.lower().strip()
     if not msg.startswith("flip "):
-        return
+        return False
 	
     s = message.content[5:].strip()	
     if not s:
-        return
+        return False
     if s.lower() == "table":
         await message.channel.send(u"(╯°□°)╯︵ ┻━┻")
     else:
-        await message.channel.send(u"(╯°□°)╯︵ " + transform(s))
+        await message.channel.send(u"(╯°□°)╯︵ " + transform(s))     
+    return True
