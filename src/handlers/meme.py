@@ -20,6 +20,8 @@ async def handle(message: discord.Message):
                 embed.add_field(name="Type", value=result["Type"], inline=True)
             if "Origin" in result:
                 embed.add_field(name="Origin", value=result["Origin"], inline=True)
+            if "Status" in result:
+                embed.add_field(name="Origin", value=result["Origin"], inline=True)
             await response.edit(content = "", embed=embed)
         else:
             await response.edit(content = "Failed getting a meme")
@@ -40,7 +42,7 @@ def meme(tries = 0):
     data_dict = {dt.get_text(strip=True): dt.find_next('dd').get_text(strip=True)
              for dt in div_element.find_all('dt')}
     
-    if (tries <= 3 and data_dict["Status"] != "Confirmed") or (tries > 3 and data_dict["Status"] == "Deadpool"):
+    if (tries <= 2 and data_dict["Status"] != "Confirmed") or (tries > 2 and data_dict["Status"] == "Deadpool"):
         return meme(tries = tries + 1)
     
     data_dict['url'] = response.url
