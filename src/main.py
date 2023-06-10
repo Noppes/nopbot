@@ -6,7 +6,7 @@ import sys
 import asyncio
 import logging
 from collections import deque
-from handlers import shouldi, flip, cat, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train
+from handlers import shouldi, flip, cat, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -22,7 +22,7 @@ client = discord.Client(intents=intents)
 cache = util.CachedMessages()
 command_cache = deque(maxlen=500)
 
-handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train]
+handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -66,6 +66,8 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
 async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
     channel = client.get_channel(payload.channel_id)
     after = await channel.fetch_message(payload.message_id)
+    if after.author.id == client.user.id:
+        return
     before = payload.cached_message or cache.get_cached_message(payload.channel_id, payload.message_id)
     if before and before.content == after.content:
         return
@@ -88,7 +90,7 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
 
 @client.event
 async def on_message(message: discord.Message):
-    if message.author == client.user or message.channel.type != discord.ChannelType.text:
+    if message.author.id == client.user.id or message.channel.type != discord.ChannelType.text:
         return
     cache.cache_message(message.channel.id, message)
     for handler in handlers:
