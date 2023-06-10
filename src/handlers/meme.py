@@ -21,7 +21,7 @@ async def handle(message: discord.Message):
             if "Origin" in result:
                 embed.add_field(name="Origin", value=result["Origin"], inline=True)
             if "Status" in result:
-                embed.add_field(name="Origin", value=result["Origin"], inline=True)
+                embed.add_field(name="Status", value=result["Status"], inline=True)
             await response.edit(content = "", embed=embed)
         else:
             await response.edit(content = "Failed getting a meme")
