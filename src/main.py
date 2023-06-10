@@ -30,6 +30,7 @@ sys.excepthook = log_exception
 
 @client.event
 async def on_ready():
+    logger.info(f'Discord.py {discord.__version__}')
     logger.info(f'We have logged in as {client.user}')
     client.loop.add_signal_handler(signal.SIGTERM, lambda: asyncio.create_task(on_close()))
     await cache.init(client)
