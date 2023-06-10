@@ -5,8 +5,8 @@ import signal
 import sys
 import asyncio
 import logging
-from normal import shouldi, flip, cat
-from commands import anagram, urbandict, choose, dict_
+from collections import deque
+from handlers import shouldi, flip, cat, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -20,8 +20,9 @@ logger.addHandler(consoleHandler)
 
 client = discord.Client(intents=intents)
 cache = util.CachedMessages()
+command_cache = deque(maxlen=500)
 
-handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_]
+handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -36,6 +37,13 @@ async def on_ready():
 
 @client.event
 async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
+    response = next((item['response'] for item in command_cache if item['message_id'] == payload.message_id), None)
+    if response:
+        try:
+            await response.delete()
+        except:
+            pass
+
     if not (message := payload.cached_message) and not (message := cache.get_cached_message(payload.channel_id, payload.message_id)):
         return
 
@@ -47,7 +55,7 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
     )
     embed.set_author(name=message.author.name + f" (ID: {message.author.id})", icon_url=message.author.avatar.url, url=message.author.avatar.url)
     embed.timestamp = message.created_at
-    if(message.author.id != message.author.id):
+    if message.author.id != message.author.id:
         responsible_user = client.get_user(payload.cached_message.author.id)
         if responsible_user:
             embed.add_field(name="Deleted By", value=responsible_user.name)
@@ -83,9 +91,9 @@ async def on_message(message: discord.Message):
     if message.author == client.user or message.channel.type != discord.ChannelType.text:
         return
     cache.cache_message(message.channel.id, message)
-
     for handler in handlers:
-        if await handler.handle(message):
+        if response := await handler.handle(message):
+            command_cache.append({"message_id":message.id, "response":response})
             return
     
     #if message.content.startswith('hello'):

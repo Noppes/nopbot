@@ -23,6 +23,5 @@ responses = [
 async def handle(message: discord.Message):
     msg = message.content.lower().strip()
     if msg.endswith("?") and msg.startswith(keywords):
-        await message.reply(random.choice(responses))
-        return True
+        return await message.channel.send(random.choice(responses))
     return False

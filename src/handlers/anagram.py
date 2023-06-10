@@ -9,8 +9,7 @@ async def handle(message: discord.Message):
             return False
         result = anagram(msg)
         if result:
-            await message.channel.send(result) 
-            return True
+            return await message.channel.send(result) 
     return False
 
 def anagram(msg):

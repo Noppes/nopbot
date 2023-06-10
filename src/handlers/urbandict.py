@@ -17,8 +17,7 @@ async def handle(message: discord.Message):
             await message.channel.send(embed=embed) 
             return True
         result = urbandict_autocomplete(msg)
-        await message.channel.send(f"Could not find any results, did you perhaps mean: {result}" if result else f"No results found for {msg}")             
-        return True
+        return await message.channel.send(f"Could not find any results, did you perhaps mean: {result}" if result else f"No results found for {msg}") 
         
     return False
 
@@ -42,4 +41,4 @@ def urbandict(msg = None):
     sorted_list = sorted(result["list"], key=lambda x: x["thumbs_up"], reverse=True)
     return sorted_list[0] if sorted_list else None
 
-print(urbandict())
+#print(urbandict())

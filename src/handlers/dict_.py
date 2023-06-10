@@ -10,8 +10,7 @@ async def handle(message: discord.Message):
             return False
         result = dict(msg)
         if not result or not result["descriptions"]:
-            await message.channel.send("No results found for: " + msg) 
-            return True
+            return await message.channel.send("No results found for: " + msg) 
 
         embed = discord.Embed(
             title = "Dictionary: " + msg.capitalize(),
@@ -19,8 +18,7 @@ async def handle(message: discord.Message):
         )
         embed.add_field(name="Definitions",  value="\n".join(["- " + item for item in result["descriptions"]]), inline=False)
         embed.add_field(name="Examples",     value="\n".join(["- " + item for item in result["examples"]]), inline=False)
-        await message.channel.send(embed=embed) 
-        return True
+        return await message.channel.send(embed=embed) 
     return False
 
 def longest_common_substring(string1, string2):
@@ -83,4 +81,4 @@ def dict(msg):
 
     return {'descriptions': definitions[:5], 'examples': examples[:5]}
 
-print(dict("your mom"))
+#print(dict("your mom"))
