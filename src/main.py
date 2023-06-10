@@ -6,7 +6,7 @@ import sys
 import asyncio
 import logging
 from collections import deque
-from handlers import shouldi, flip, cat, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands
+from handlers import shouldi, flip, cat, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands, lenny, roll
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -22,7 +22,7 @@ client = discord.Client(intents=intents)
 cache = util.CachedMessages()
 command_cache = deque(maxlen=500)
 
-handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands]
+handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands, lenny, roll]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
@@ -53,7 +53,7 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
         color = discord.Color.red(),
         timestamp = message.created_at
     )
-    embed.set_author(name=message.author.name + f" (ID: {message.author.id})", icon_url=message.author.avatar.url, url=message.author.avatar.url)
+    embed.set_author(name=message.author.display_name + f" (ID: {message.author.id})", icon_url=message.author.avatar.url, url=message.author.avatar.url)
     embed.timestamp = message.created_at
     if message.author.id != message.author.id:
         responsible_user = client.get_user(payload.cached_message.author.id)
@@ -78,7 +78,7 @@ async def on_raw_message_edit(payload: discord.RawMessageUpdateEvent):
         url = after.jump_url,
         timestamp = after.edited_at
     )
-    embed.set_author(name=after.author.name + f" (ID: {after.author.id})", icon_url=after.author.avatar.url, url=after.author.avatar.url)
+    embed.set_author(name=after.author.display_name + f" (ID: {after.author.id})", icon_url=after.author.avatar.url, url=after.author.avatar.url)
     if before:
         embed.add_field(name="Before", value=before.content, inline=True)
     else:
