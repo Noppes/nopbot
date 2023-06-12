@@ -55,6 +55,10 @@ async def on_raw_message_delete(payload: discord.RawMessageDeleteEvent):
         timestamp = message.created_at
     )
     embed.set_author(name=message.author.display_name + f" (ID: {message.author.id})", icon_url=message.author.avatar.url, url=message.author.avatar.url)
+    if message.attachments:
+        embed.add_field(name="Attachements",  value="\n".join(["- " + item.url for item in message.attachments]), inline=False)
+
+
     embed.timestamp = message.created_at
     if message.author.id != message.author.id:
         responsible_user = client.get_user(payload.cached_message.author.id)
