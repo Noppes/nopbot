@@ -6,7 +6,7 @@ import sys
 import asyncio
 import logging
 from collections import deque
-from handlers import shouldi, flip, cat, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands, lenny, roll
+from handlers import shouldi, flip, cat, dog, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands, lenny, roll
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -22,7 +22,7 @@ client = discord.Client(intents=intents)
 cache = util.CachedMessages()
 command_cache = deque(maxlen=500)
 
-handlers = [shouldi, flip, cat, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands, lenny, roll]
+handlers = [shouldi, flip, cat, dog, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands, lenny, roll]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
