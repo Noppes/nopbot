@@ -1,6 +1,7 @@
 import discord
 import requests
 import jellyfish
+import random
 from bs4 import BeautifulSoup
 from urllib.parse import quote
 
@@ -77,9 +78,9 @@ def dict(msg):
         if add:
             definitions.append(s)
     elements = soup.find('div', id = "tmem_first_examples").find_all('span')
-    examples = [li.get_text() for li in elements if li.get_text()]
-    print(examples)
+    examples = [li.get_text() for li in elements if li.get_text() and len(li.get_text()) <= 200]
 
-    return {'descriptions': definitions[:5], 'examples': examples[:5]}
+    num_examples = max(7 - len(definitions), 3)    
+    return {'descriptions': definitions[:4], 'examples': random.sample(examples, num_examples)}
 
 #print(dict("your mom"))
