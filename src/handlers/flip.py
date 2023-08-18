@@ -58,7 +58,7 @@ def findWholeWord(w):
     return re.compile(r'\b({0})\b'.format(w), flags=re.IGNORECASE).search
 
 async def handle(message: discord.Message):
-    if message.content == u"(╯°□°)╯︵ ┻━┻":
+    if u"(╯°□°)╯︵ ┻━┻" in message.content:
         return await message.channel.send(u"(╯°□°)╯︵ " + transform(message.author.display_name))
         
     msg = message.content.lower().strip()

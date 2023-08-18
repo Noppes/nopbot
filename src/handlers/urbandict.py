@@ -14,8 +14,7 @@ async def handle(message: discord.Message):
             )
             embed.add_field(name="Definition",  value=result['definition'].replace("[", "").replace("]", ""), inline=False)
             embed.add_field(name="Example",     value=result['example'].replace("[", "").replace("]", ""), inline=False)
-            await message.channel.send(embed=embed) 
-            return True
+            return await message.channel.send(embed=embed) 
         result = urbandict_autocomplete(msg)
         return await message.channel.send(f"Could not find any results, did you perhaps mean: {result}" if result else f"No results found for {msg}") 
         

@@ -6,10 +6,11 @@ import sys
 import asyncio
 import logging
 from collections import deque
-from handlers import shouldi, flip, cat, dog, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands, lenny, roll, version, update_question
+from handlers import shouldi, flip, cat, dog, anagram, urbandict, choose, dict_, faces, fact, quote, roulette, meme, train, commands, lenny, roll, version, update_question, repeat
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True 
 
 logger = logging.getLogger("nopbot")
 logFormatter = logging.Formatter("[%(asctime)s] [%(filename)s(%(lineno)d)] [%(levelname)s] %(message)s",'%y-%m-%d %H:%M:%S')
@@ -22,7 +23,7 @@ client = discord.Client(intents=intents)
 cache = util.CachedMessages()
 command_cache = deque(maxlen=500)
 
-handlers = [update_question, shouldi, flip, cat, dog, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands, lenny, roll, version]
+handlers = [update_question, shouldi, flip, cat, dog, urbandict, anagram, choose, dict_, faces, fact, meme, quote, roulette, train, commands, lenny, roll, version, repeat]
 
 def log_exception(self, exc_type, exc_value, exc_traceback):
     logger.exception("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))

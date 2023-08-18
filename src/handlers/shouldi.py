@@ -1,7 +1,7 @@
 import discord
 import random
 
-keywords = ("should ", "will ", "do ", "am i ", "does ", "are ", "did ", "is ", "that ")
+keywords = ("should ", "will ", "do ", "am i ", "does ", "are ", "did ", "is ", "that ", "were ", "does ")
 responses = [
     "It is certain",
     "It is decidedly so",
