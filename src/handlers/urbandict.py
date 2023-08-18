@@ -1,6 +1,7 @@
 import discord
 import requests
 from datetime import datetime
+from urllib.parse import quote
 
 async def handle(message: discord.Message):
     if message.content.startswith("!urbandict"):
@@ -21,7 +22,7 @@ async def handle(message: discord.Message):
     return False
 
 def urbandict_autocomplete(msg = None):
-    response = requests.get("https://api.urbandictionary.com/v0/autocomplete?term=" + msg)
+    response = requests.get(f"https://api.urbandictionary.com/v0/autocomplete?term={quote(msg)}")
     if response.status_code != 200:
         return False
     return ", ".join(response.json())
@@ -30,7 +31,7 @@ def urbandict(msg = None):
     if not msg:
         url = "https://api.urbandictionary.com/v0/random"
     else:
-        url = "https://api.urbandictionary.com/v0/define?term=" + msg
+        url = f"https://api.urbandictionary.com/v0/define?term={quote(msg)}"
 
     response = requests.get(url)
     if response.status_code != 200:

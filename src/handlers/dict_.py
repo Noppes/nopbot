@@ -2,6 +2,7 @@ import discord
 import requests
 import jellyfish
 from bs4 import BeautifulSoup
+from urllib.parse import quote
 
 async def handle(message: discord.Message):
     if message.content.startswith("!dict "):
@@ -14,7 +15,7 @@ async def handle(message: discord.Message):
 
         embed = discord.Embed(
             title = "Dictionary: " + msg.capitalize(),
-            url = f"https://glosbe.com/en/en/{msg}"
+            url = f"https://glosbe.com/en/en/{quote(msg)}"
         )
         embed.add_field(name="Definitions",  value="\n".join(["- " + item for item in result["descriptions"]]), inline=False)
         embed.add_field(name="Examples",     value="\n".join(["- " + item for item in result["examples"]]), inline=False)
@@ -56,7 +57,7 @@ def dict(msg):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
-    response = requests.get(f"https://glosbe.com/en/en/{msg}", headers=headers)
+    response = requests.get(f"https://glosbe.com/en/en/{quote(msg)}", headers=headers)
     if response.status_code != 200:
         return False
 
