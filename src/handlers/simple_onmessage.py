@@ -12,7 +12,7 @@ class SimpleOnMessageCog(commands.Cog):
         self.faces = {
             ">.>":"<.<", "<.<":">.>", "<.>":">.<", ">.<":"<.>",
             ">_>":"<_<", "<_<":">_>", "<_>":">_<", ">_<":"<_>", 
-            "\o/":"\o/", "o/":"\o", "\o":"o/", "nuh uh ":"yuh uh"
+            "\o/":"\o/", "o/":"\o", "\o":"o/"
             }
         self.face_history = {}
         self.repeat_history = {}
@@ -25,13 +25,13 @@ class SimpleOnMessageCog(commands.Cog):
         self.cache.cache_command_message(message, response)
     
     async def handle_faces(self, message: discord.Message):
-        msg = message.content.lower().strip()
-        last_triggered = self.face_history.get(message.channel, False)
+        msg = message.content.lower().strip()        
         for key in self.faces:
             if msg.endswith(key):
-                if last_triggered:
+                last_triggered = self.face_history.get(message.channel, False)
+                if last_triggered == self.faces[key] or last_triggered == key:
                     return False
-                self.face_history[message.channel] = True
+                self.face_history[message.channel] = key
                 return await message.channel.send(self.faces[key]) 
         self.face_history[message.channel] = False
         
