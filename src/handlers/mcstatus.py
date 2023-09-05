@@ -9,6 +9,8 @@ class McStatusCog(commands.Cog):
         self.logger = logger
         self.channel = bot.get_channel(references.message_mcstatus_channel_id)
         self.prev_status = self.status()
+        self.check_status = self.status()
+        self.count = 0
         self.status_check.start()
 
     def status(self):
@@ -39,6 +41,10 @@ class McStatusCog(commands.Cog):
     async def status_check(self):
         result = self.status()
         if result and self.prev_status != result:
+            self.count += 1
+            if(self.count < 4):#making sure the status is changed for multiple minutes
+                return
+            self.count = 0
             self.prev_status = result
             description = "Minecraft services no longer have issues" if all(value == "Looks Operational" for value in result.values()) else "Looks like one of Minecraft's services is experiencing issues"
             embed = discord.Embed(
