@@ -5,6 +5,7 @@ class CachedMessages():
     async def init(self, client: discord.Client):
         self.client = client
         self.message_cache = dict()
+        self.command_cache = deque(maxlen=500)
         
         for guild in client.guilds:
             member = guild.get_member(client.user.id)
@@ -27,3 +28,15 @@ class CachedMessages():
             messages = deque(maxlen=100)
             self.message_cache[channel_id] = messages
         messages.append(message)
+
+    def cache_command_message(self, message, response):
+        if response:
+            self.command_cache.append({"message_id":message.id, "response":response})
+
+    async def delete_command(self, message_id):
+        response = next((item['response'] for item in self.command_cache if item['message_id'] == message_id), None)
+        if response:
+            try:
+                await response.delete()
+            except:
+                pass
