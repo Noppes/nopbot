@@ -40,8 +40,11 @@ class QuestionCog(commands.Cog):
     async def on_message(self, message: discord.Message):
         msg = message.content.lower().strip()
 
-        if msg.endswith("?") and "update" in msg and ("mod" in msg or "npc" in msg or "mpm" or self.contains_number(msg)):
+        if msg.endswith("?") and "update" in msg and ("mod" in msg or "npc" in msg or "mpm" in msg or self.contains_number(msg)):
             self.cache.cache_command_message(message, await message.channel.send(random.choice(self.update_responses)))
+
+        if message.channel.type == discord.enums.ChannelType.forum:
+            return
 
         elif msg.endswith("?") and msg.startswith(self.keywords):
             self.cache.cache_command_message(message, await message.channel.send(random.choice(self.responses)))
