@@ -42,7 +42,7 @@ class McStatusCog(commands.Cog):
         result = self.status()
         if result and self.prev_status != result:
             self.count += 1
-            if(self.count < 4):#making sure the status is changed for multiple minutes
+            if(self.count < 6):#making sure the status is changed for multiple minutes
                 return
             self.count = 0
             self.prev_status = result
