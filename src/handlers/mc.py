@@ -1,13 +1,18 @@
 import discord
 from discord.ext import tasks, commands
+
 import requests
 import references
-from bs4 import BeautifulSoup
-import datetime
-from datetime import datetime, timedelta
+import base64
+import json
+import io
 
-class McStatusCog(commands.Cog):
-    def __init__(self, bot, logger):
+from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
+
+class MinecraftCog(commands.Cog):
+    def __init__(self, bot, logger, cache):
+        self.cache = cache
         self.logger = logger
         self.channel = bot.get_channel(references.message_mcstatus_channel_id)
         self.prev_status = False
@@ -50,7 +55,7 @@ class McStatusCog(commands.Cog):
             
             embed.add_field(name="", value='\n'.join(formatted_keys), inline=True)
             embed.add_field(name="", value='\n'.join(result.values()), inline=True)
-            await ctx.send(embed=embed)
+            self.cache.cache_command_message(ctx.message, await ctx.send(embed=embed))
 
     @tasks.loop(seconds=60)
     async def status_check(self):
@@ -116,7 +121,7 @@ class McStatusCog(commands.Cog):
         embed.add_field(name="", value='\n'.join(formatted_keys), inline=True)
         embed.add_field(name="", value='\n'.join(formatted_days), inline=True)
         embed.add_field(name="", value='\n'.join(formatted_ages), inline=True)
-        await ctx.send(embed=embed)
+        self.cache.cache_command_message(ctx.message, await ctx.send(embed=embed))
 
     def get_date_diff(self, date1: datetime, date2: datetime):
         time_difference = date2 - date1
@@ -127,4 +132,45 @@ class McStatusCog(commands.Cog):
         months = remaining_days // 30  # Assuming an average of 30 days per month
         days = remaining_days % 30
         return f"Years: {years}, Months: {months}, Days: {days}"
+        
+
+    # https://wiki.vg/Mojang_API
+    @commands.command()
+    async def mcplayer(self, ctx: commands.context.Context, name:str):        
+        response = requests.post(f"https://api.mojang.com/profiles/minecraft", json=[name])
+
+        result = response.json()
+        if not result:
+            self.cache.cache_command_message(ctx.message, await ctx.send(f"User {name} not found"))
+            return
+        else:
+            response = requests.get(f"https://sessionserver.mojang.com/session/minecraft/profile/" + result[0]['id'])
+            result = response.json()
+            embed = discord.Embed(
+                title=f"Result for {result['name']}"
+            )
+            embed.add_field(name="", value="Id: " + result['id'], inline=False)
+            embeds = [embed]
+
+            texture_text = next((prop['value'] for prop in result['properties'] if prop["name"] == "textures"), False)
+            if texture_text:
+                texture = json.loads(base64.b64decode(texture_text).decode('utf-8'))['textures']
+                if 'SKIN' in texture:
+                    skin_type = "Classic"
+                    if 'metadata' in texture['SKIN'] and 'model' in texture['SKIN']['metadata']:
+                        skin_type = texture['SKIN']['metadata']['model'].capitalize()
+                    embed.add_field(name="", value=f"Skin type: {skin_type}", inline=False)
+                    if 'url' in texture['SKIN']:
+                        embed.add_field(name="", value=f"Skin url: {texture['SKIN']['url']}", inline=False)
+                        embed.set_image(url=texture['SKIN']['url'])
+                if 'CAPE' in texture and 'url' in texture['CAPE']:                    
+                    cape_embed = discord.Embed(
+                        title=f"",
+                    )
+                    cape_embed.add_field(name="", value=f"Cape url: {texture['CAPE']['url']}", inline=False)
+                    cape_embed.set_image(url=texture['CAPE']['url'])
+                    embeds.append(cape_embed)
+
+            self.cache.cache_command_message(ctx.message, await ctx.channel.send(embeds=embeds))
+                
 

@@ -13,7 +13,7 @@ from handlers.anagram import AnagramCog
 from handlers.dict_ import DictCog
 from handlers.editdelete import EditDeleteCog
 from handlers.flip import FlipCog
-from handlers.mcstatus import McStatusCog
+from handlers.mc import MinecraftCog
 from handlers.meme import MemeCog
 from handlers.question import QuestionCog
 from handlers.quote import QuoteCog
@@ -48,7 +48,7 @@ async def on_ready():
     await client.add_cog(DictCog(client, logger))
     await client.add_cog(EditDeleteCog(client, logger, cache))
     await client.add_cog(FlipCog(client, logger, cache))
-    await client.add_cog(McStatusCog(client, logger))
+    await client.add_cog(MinecraftCog(client, logger, cache))
     await client.add_cog(MemeCog(client, logger))
     await client.add_cog(QuestionCog(client, logger, cache))
     await client.add_cog(QuoteCog(client, logger))
