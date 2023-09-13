@@ -22,7 +22,7 @@ class DictCog(commands.Cog):
     async def dict_command(self, ctx: commands.context.Context, *, msg:str):
         result = self.dict_(msg)
         if not result or not result["descriptions"]:
-            return await message.channel.send("No results found for: " + msg) 
+            return await ctx.send("No results found for: " + msg) 
 
         embed = discord.Embed(
             title = "Dictionary: " + msg.capitalize(),
@@ -30,7 +30,7 @@ class DictCog(commands.Cog):
         )
         embed.add_field(name="Definitions",  value="\n".join(["- " + item for item in result["descriptions"]]), inline=False)
         embed.add_field(name="Examples",     value="\n".join(["- " + item for item in result["examples"]]), inline=False)
-        await message.channel.send(embed=embed) 
+        await ctx.send(embed=embed) 
 
     def longest_common_substring(self, string1, string2):
         m = len(string1)
@@ -54,6 +54,10 @@ class DictCog(commands.Cog):
         return longest_substring
 
     def similar_strings(self, s1, s2):
+        if s1 == s2:
+            return True
+        if not s1 or not s2:
+            return False
         if (1 - (jellyfish.levenshtein_distance(s1, s2) / max(len(s1), len(s2)))) > 0.8:
             return True
         if jellyfish.jaro_distance(s1, s2) > 0.8:
@@ -103,9 +107,9 @@ class DictCog(commands.Cog):
             )
             embed.add_field(name="Definition",  value=result['definition'].replace("[", "").replace("]", ""), inline=False)
             embed.add_field(name="Example",     value=result['example'].replace("[", "").replace("]", ""), inline=False)
-            return await message.channel.send(embed=embed) 
+            return await ctx.send(embed=embed) 
         result = self.urbandict_autocomplete(msg)
-        return await message.channel.send(f"Could not find any results, did you perhaps mean: {result}" if result else f"No results found for {msg}") 
+        return await ctx.send(f"Could not find any results, did you perhaps mean: {result}" if result else f"No results found for {msg}") 
 
     def urbandict_autocomplete(self, msg = None):
         response = requests.get(f"https://api.urbandictionary.com/v0/autocomplete?term={quote(msg)}")
@@ -124,7 +128,7 @@ class DictCog(commands.Cog):
             return False
 
         result = response.json()
-        sorted_list = sorted(result["list"], key=lambda x: x["thumbs_up"], reverse=True)
+        sorted_list = sorted(result["list"], key=lambda x: (self.similar_strings(msg, x["word"]), x["thumbs_up"]), reverse=True)
         return sorted_list[0] if sorted_list else None
 
 #print(dict("your mom"))

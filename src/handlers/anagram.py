@@ -13,7 +13,7 @@ class AnagramCog(commands.Cog):
     async def anagram_command(self, ctx: commands.context.Context, *, msg:str):
         result = self.anagram(msg)
         if result:
-            return await message.channel.send(result) 
+            return await ctx.send(result) 
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
