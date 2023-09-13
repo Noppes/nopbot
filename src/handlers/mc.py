@@ -7,6 +7,7 @@ import base64
 import json
 import io
 
+from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
@@ -124,14 +125,8 @@ class MinecraftCog(commands.Cog):
         self.cache.cache_command_message(ctx.message, await ctx.send(embed=embed))
 
     def get_date_diff(self, date1: datetime, date2: datetime):
-        time_difference = date2 - date1
-
-        # Extract years, months, and days from the time difference
-        years = time_difference.days // 365
-        remaining_days = time_difference.days % 365
-        months = remaining_days // 30  # Assuming an average of 30 days per month
-        days = remaining_days % 30
-        return f"Years: {years}, Months: {months}, Days: {days}"
+        age = relativedelta(date2, date1)
+        return f"Years: {age.years}, Months: {age.months}, Days: {age.days}"
         
 
     # https://wiki.vg/Mojang_API
