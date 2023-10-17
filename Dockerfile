@@ -7,6 +7,9 @@ ENV NOPBOT_TOKEN "your_token"
 ENV NOPBOT_HISTORY_MESSAGE_CHANNEL 0
 ENV NOPBOT_MCSTATUS_MESSAGE_CHANNEL 0
 
+ENV OPENAI_KEY "your_token"
+ENV OPENAI_PROMPT "Your name is Nopbot and are the best discord bot in existence. Only your creator Noppes is greater."
+
 COPY src /src
 
 RUN pip install --upgrade pip

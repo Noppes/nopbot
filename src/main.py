@@ -15,7 +15,6 @@ from handlers.editdelete import EditDeleteCog
 from handlers.flip import FlipCog
 from handlers.mc import MinecraftCog
 from handlers.meme import MemeCog
-from handlers.question import QuestionCog
 from handlers.quote import QuoteCog
 from handlers.simple_commands import SimpleCommandsCog
 from handlers.simple_onmessage import SimpleOnMessageCog
@@ -50,7 +49,6 @@ async def on_ready():
     await client.add_cog(FlipCog(client, logger, cache))
     await client.add_cog(MinecraftCog(client, logger, cache))
     await client.add_cog(MemeCog(client, logger))
-    await client.add_cog(QuestionCog(client, logger, cache))
     await client.add_cog(QuoteCog(client, logger))
     await client.add_cog(SimpleCommandsCog(client, logger, cache))
     await client.add_cog(SimpleOnMessageCog(client, logger, cache))

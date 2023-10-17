@@ -1,6 +1,9 @@
 import discord
 from discord.ext import tasks, commands
 import random
+import openai
+import references
+import datetime
 
 
 class SimpleOnMessageCog(commands.Cog):
@@ -9,6 +12,11 @@ class SimpleOnMessageCog(commands.Cog):
         self.logger = logger
         self.bot = bot
         self.cache = cache
+        self.openai_enabled = False
+        self.openai_channels = {}
+        if references.openai_key != 'your_key' and references.openai_key:
+            self.openai_enabled = True
+            openai.api_key = references.openai_key
         self.faces = {
             ">.>":"<.<", "<.<":">.>", "<.>":">.<", ">.<":"<.>",
             ">_>":"<_<", "<_<":">_>", "<_>":">_<", ">_<":"<_>", 
@@ -16,10 +24,41 @@ class SimpleOnMessageCog(commands.Cog):
             }
         self.face_history = {}
         self.repeat_history = {}
+        
+        self.question_keywords = ("should ", "will ", "do ", "am i ", "does ", "are ", "did ", "is ", "that ", "were ", "does ", "was ")
+        self.question_responses = [
+            "It is certain",
+            "It is decidedly so",
+            "Without a doubt",
+            "Yes - definitely",
+            "As I see it, yes",
+            "Most likely",
+            "Outlook good",
+            "Yes",
+            "No",
+            "Signs point to yes",
+            "Ask again later",
+            "My reply is no",
+            "My sources say no",
+            "Outlook not so good",
+            "Very doubtful"
+        ]
+        self.version_pattern = r"\d+(\.\d+)+"
+        self.update_responses = [
+            "Have you read frequently asked questions?",
+            "Noppes has been busy with work, but is still working on this mods",
+            "Noppes is still updating to newer version",
+            "Updating mods is quite time-consuming, it's still being worked on",
+            "Somebody didnt read the rules",
+        ]
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        response = await self.handle_faces(message)
+        response = await self.ai_response(message)
+        if not response:
+            response = await self.on_question(message)
+        if not response:
+            response = await self.handle_faces(message)
         if not response:
             response = await self.handle_repeat(message)
         self.cache.cache_command_message(message, response)
@@ -34,6 +73,7 @@ class SimpleOnMessageCog(commands.Cog):
                 self.face_history[message.channel] = key
                 return await message.channel.send(self.faces[key]) 
         self.face_history[message.channel] = False
+        return False
         
     async def handle_repeat(self, message: discord.Message):
         ctx = await self.bot.get_context(message)
@@ -56,5 +96,52 @@ class SimpleOnMessageCog(commands.Cog):
         self.repeat_history[message.channel.id] = (msg, messages)
         if len(messages) == 3:
             return await message.channel.send(random.choice(messages))  
+        return False
+
+    async def ai_response(self, message: discord.Message):
+        if not self.openai_enabled or 'nopbot' not in message.clean_content.lower().strip():
+            return False
+        MSGS = [ 
+            {"role": "system", "content": references.openai_prompt}
+        ]
+        now = datetime.datetime.now()
+        if message.channel.id in self.openai_channels:
+            (history, timestamp) = self.openai_channels[message.channel.id]
+            if (now - timestamp).total_seconds() / 60 < 5: #if last response was no more than 5 min old use it
+                MSGS = history
+
+        MSGS.append({"role": "user", "content": message.clean_content})
+
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=MSGS,
+                max_tokens=50
+            )
+            response = response['choices'][0]['message']['content']
+            MSGS.append({"role": "assistant", "content": response})
+            self.openai_channels[message.channel.id] = (MSGS, now)
+            return await message.channel.send(response)  
+        except Exception as e:
+            self.logger.exception(e)
+            return False
+        
+    async def on_question(self, message: discord.Message):
+        msg = message.content.lower().strip()
+
+        if msg.endswith("?") and "update" in msg and ("mod" in msg or "npc" in msg or "mpm" in msg or self.contains_number(msg)):
+            return await message.channel.send(random.choice(self.update_responses))
+
+        if message.channel.type == discord.enums.ChannelType.forum:
+            return False
+
+        elif msg.endswith("?") and msg.startswith(self.question_keywords):
+            return await message.channel.send(random.choice(self.question_responses))
+
+        return False
+        
+        
+    def contains_number(self, string):
+        return bool(re.search(self.version_pattern, string))
 
 
