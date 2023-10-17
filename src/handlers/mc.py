@@ -41,8 +41,9 @@ class MinecraftCog(commands.Cog):
         java = soup.find('h3', text = "Minecraft Java").find_parent()
         divs = java.find_all('div', class_='w3-container')
 
-        return {div.find('h4').get_text(strip=True): div.find('h5').get_text(strip=True)
+        data = {div.find('h4').get_text(strip=True): div.find('h5').get_text(strip=True)
                 for div in java.find_all('div', class_='w3-container')}
+        return data
 
     @commands.command()
     async def mcstatus(self, ctx: commands.context.Context):
@@ -63,6 +64,7 @@ class MinecraftCog(commands.Cog):
         result = self.status()
         if not result:
             return
+        result.pop("api", None)
 
         if not self.prev_status:
             self.prev_status = result
@@ -70,7 +72,8 @@ class MinecraftCog(commands.Cog):
 
         if self.prev_status != result:
             self.count += 1
-            if(self.count < 6):#making sure the status is changed for multiple minutes
+            was_fine = all(value == "Looks Operational" for value in prev_status.values())
+            if(self.count < 6 and was_fine):#making sure the status is changed for multiple minutes
                 return
             self.count = 0
             self.prev_status = result
