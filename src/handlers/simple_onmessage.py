@@ -115,7 +115,7 @@ class SimpleOnMessageCog(commands.Cog):
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=MSGS,
-                max_tokens=50
+                max_tokens=100
             )
             response = response['choices'][0]['message']['content']
             MSGS.append({"role": "assistant", "content": response})
