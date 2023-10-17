@@ -106,10 +106,10 @@ class SimpleOnMessageCog(commands.Cog):
         now = datetime.datetime.now()
         if message.channel.id in self.openai_channels:
             (history, timestamp) = self.openai_channels[message.channel.id]
-            if (now - timestamp).total_seconds() / 60 < 5: #if last response was no more than 5 min old use it
+            if (now - timestamp).total_seconds() / 60 < 15: #if last response was no more than 5 min old use it
                 MSGS = history
 
-        MSGS.append({"role": "user", "content": message.clean_content})
+        MSGS.append({"role": "user", "content": f"the user {message.author.display_name} says: {message.clean_content}" })
 
         try:
             response = openai.ChatCompletion.create(
