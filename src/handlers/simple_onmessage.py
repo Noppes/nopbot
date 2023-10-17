@@ -54,6 +54,9 @@ class SimpleOnMessageCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        ctx = await self.bot.get_context(message)
+        if ctx.valid and ctx.command or message.author.id == self.bot.user.id:
+            return
         response = await self.ai_response(message)
         if not response:
             response = await self.on_question(message)
@@ -76,10 +79,6 @@ class SimpleOnMessageCog(commands.Cog):
         return False
         
     async def handle_repeat(self, message: discord.Message):
-        ctx = await self.bot.get_context(message)
-        if ctx.valid and ctx.command:
-            return False
-
         msg = message.content.lower().strip()
         if message.channel.id not in self.repeat_history:
             self.repeat_history[message.channel.id] = (msg, [message.content])
