@@ -72,7 +72,7 @@ class MinecraftCog(commands.Cog):
 
         if self.prev_status != result:
             self.count += 1
-            was_fine = all(value == "Looks Operational" for value in prev_status.values())
+            was_fine = all(value == "Looks Operational" for value in self.prev_status.values())
             if(self.count < 6 and was_fine):#making sure the status is changed for multiple minutes
                 return
             self.count = 0

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import tasks, commands
 import random
-import openai
+from openai import AsyncOpenAI
 import references
 import datetime
 
@@ -16,7 +16,9 @@ class SimpleOnMessageCog(commands.Cog):
         self.openai_channels = {}
         if references.openai_key != 'your_key' and references.openai_key:
             self.openai_enabled = True
-            openai.api_key = references.openai_key
+            self.chatbot = AsyncOpenAI(
+                api_key=references.openai_key,
+            )
         self.faces = {
             ">.>":"<.<", "<.<":">.>", "<.>":">.<", ">.<":"<.>",
             ">_>":"<_<", "<_<":">_>", "<_>":">_<", ">_<":"<_>", 
@@ -106,18 +108,19 @@ class SimpleOnMessageCog(commands.Cog):
         now = datetime.datetime.now()
         if message.channel.id in self.openai_channels:
             (history, timestamp) = self.openai_channels[message.channel.id]
-            if (now - timestamp).total_seconds() / 60 < 15: #if last response was no more than 5 min old use it
+            if (now - timestamp).total_seconds() / 60 < 15: #if last response was no more than 15 min old use it
                 MSGS = history
 
         MSGS.append({"role": "user", "content": f"the user {message.author.display_name} says: {message.clean_content}" })
 
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+            response = await self.chatbot.chat.completions.create(
+                model="gpt-3.5-turbo-1106",
                 messages=MSGS,
-                max_tokens=100
+                max_tokens=100,
+                temperature=0.7
             )
-            response = response['choices'][0]['message']['content']
+            response = response.choices[0].message.content
             MSGS.append({"role": "assistant", "content": response})
             self.openai_channels[message.channel.id] = (MSGS, now)
             return await message.channel.send(response)  
