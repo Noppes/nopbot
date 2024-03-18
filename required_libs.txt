@@ -1,6 +1,6 @@
-discord
+discord.py
 requests
 beautifulsoup4
-jellyfish
+jellyfish==1.0.0
 python-dateutil
 openai

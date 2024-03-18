@@ -22,7 +22,7 @@ class SimpleOnMessageCog(commands.Cog):
         self.faces = {
             ">.>":"<.<", "<.<":">.>", "<.>":">.<", ">.<":"<.>",
             ">_>":"<_<", "<_<":">_>", "<_>":">_<", ">_<":"<_>", 
-            "\o/":"\o/", "o/":"\o", "\o":"o/"
+            "\o/":"\o/", "o/":"\o", "\o":"o/", "o7":"o7"
             }
         self.face_history = {}
         self.repeat_history = {}
@@ -100,7 +100,7 @@ class SimpleOnMessageCog(commands.Cog):
         return False
 
     async def ai_response(self, message: discord.Message):
-        if not self.openai_enabled or 'nopbot' not in message.clean_content.lower().strip():
+        if not self.openai_enabled or ('nopbot' not in message.clean_content.lower().strip() and not await self._is_reply(message)):
             return False
         MSGS = [ 
             {"role": "system", "content": references.openai_prompt}
@@ -127,6 +127,13 @@ class SimpleOnMessageCog(commands.Cog):
         except Exception as e:
             self.logger.exception(e)
             return False
+
+    async def _is_reply(self, message: discord.Message):
+        if message.reference is None or message.type != discord.enums.MessageType.reply:
+            return False
+        ctx = await self.bot.get_context(message)
+        cm = await ctx.fetch_message(message.reference.message_id)
+        return cm.author.id == self.user.id
         
     async def on_question(self, message: discord.Message):
         msg = message.content.lower().strip()
@@ -137,8 +144,8 @@ class SimpleOnMessageCog(commands.Cog):
         if message.channel.type == discord.enums.ChannelType.forum:
             return False
 
-        elif msg.endswith("?") and msg.startswith(self.question_keywords):
-            return await message.channel.send(random.choice(self.question_responses))
+        # elif msg.endswith("?") and msg.startswith(self.question_keywords):
+        #     return await message.channel.send(random.choice(self.question_responses))
 
         return False
         
