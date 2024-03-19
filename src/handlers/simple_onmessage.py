@@ -133,7 +133,7 @@ class SimpleOnMessageCog(commands.Cog):
             return False
         ctx = await self.bot.get_context(message)
         cm = await ctx.fetch_message(message.reference.message_id)
-        return cm.author.id == self.user.id
+        return cm and cm.author.id == self.bot.user.id
         
     async def on_question(self, message: discord.Message):
         msg = message.content.lower().strip()
