@@ -18,7 +18,6 @@ class MinecraftCog(commands.Cog):
         self.channel = bot.get_channel(references.message_mcstatus_channel_id)
         self.prev_status = False
         self.count = 0
-        self.status_check.start()
         self.date_check.start()
 
         self.lastcheck = False
@@ -31,6 +30,7 @@ class MinecraftCog(commands.Cog):
             '1.12.2': datetime(2017, 9, 18),
             '1.16.5': datetime(2021, 1, 15),
             '1.18.2': datetime(2022, 2, 28),
+            '1.20.1': datetime(2023, 6, 12),
         }
 
     def status(self):
@@ -58,35 +58,6 @@ class MinecraftCog(commands.Cog):
             embed.add_field(name="", value='\n'.join(formatted_keys), inline=True)
             embed.add_field(name="", value='\n'.join(result.values()), inline=True)
             self.cache.cache_command_message(ctx.message, await ctx.send(embed=embed))
-
-    @tasks.loop(seconds=60)
-    async def status_check(self):
-        result = self.status()
-        if not result:
-            return
-        result.pop("api", None)
-
-        if not self.prev_status:
-            self.prev_status = result
-            return
-
-        if self.prev_status != result:
-            self.count += 1
-            was_fine = all(value == "Looks Operational" for value in self.prev_status.values())
-            if(self.count < 6 and was_fine):#making sure the status is changed for multiple minutes
-                return
-            self.count = 0
-            self.prev_status = result
-            description = "Minecraft services no longer have issues" if all(value == "Looks Operational" for value in result.values()) else "Looks like one of Minecraft's services is experiencing issues"
-            embed = discord.Embed(
-                title="Minecraft Status",
-                url = "https://minecraftstatus.net/",
-                description=description
-            )
-            formatted_keys = ["**" + key +":**" for key in result.keys()]
-            embed.add_field(name="", value='\n'.join(formatted_keys), inline=True)
-            embed.add_field(name="", value='\n'.join(result.values()), inline=True)
-            await self.channel.send(embed=embed) 
     
 
     @tasks.loop(seconds=60)

@@ -144,7 +144,7 @@ class SimpleOnMessageCog(commands.Cog):
         if message.channel.type == discord.enums.ChannelType.forum:
             return False
 
-        # elif msg.endswith("?") and msg.startswith(self.question_keywords):
+        # elif random.randint(0, 10) == 1 and msg.endswith("?") and msg.startswith(self.question_keywords):
         #     return await message.channel.send(random.choice(self.question_responses))
 
         return False
