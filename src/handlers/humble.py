@@ -61,7 +61,7 @@ class HumbleCog(commands.Cog):
             hours = int(total_seconds // 3600)
             minutes = int((total_seconds % 3600) // 60)
             seconds = int(total_seconds % 60)
-            embed.add_field(name="Countdown", value=f"{hours}:{minutes}:{seconds}")
+            embed.add_field(name="Countdown", value=f"{hours:02}:{minutes:02}:{seconds:02}")
         return embed
 
     def get_bundles(self):
