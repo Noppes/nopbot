@@ -15,7 +15,7 @@ class HumbleCog(commands.Cog):
     def __init__(self, bot, logger, cache):
         self.cache = cache
         self.logger = logger
-        self.channel = bot.get_channel(references.message_mcstatus_channel_id)
+        self.channel = bot.get_channel(references.message_gaming_channel_id)
         self.bundle_types = ['games', 'books', 'software']
         self.availble_bundles = []
         self.bundles_check.start()
@@ -27,14 +27,14 @@ class HumbleCog(commands.Cog):
 
         bundles = self.get_bundles()
         if bundle_type not in bundles:
-            self.channel.send(f"No bundles currently available for `{bundle_type}`")
+            ctx.channel.send(f"No bundles currently available for `{bundle_type}`")
             return True
         products = bundles[bundle_type]
         embeds = []
         for prod in products:
             embeds.append(self.product_embed(prod))
         for i in range(0, len(embeds), 10):
-            await self.channel.send(embeds=embeds[i:i + 10]) 
+            await ctx.channel.send(embeds=embeds[i:i + 10]) 
     
     def format_blurb(self, text:str):
         text = text.replace('<em>', '**')
