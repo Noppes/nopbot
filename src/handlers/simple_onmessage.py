@@ -4,6 +4,7 @@ import random
 from openai import AsyncOpenAI
 import references
 import datetime
+import re
 
 
 class SimpleOnMessageCog(commands.Cog):
@@ -66,6 +67,8 @@ class SimpleOnMessageCog(commands.Cog):
             response = await self.handle_faces(message)
         if not response:
             response = await self.handle_repeat(message)
+        if not response:
+            response = await self.handle_train(message)
         self.cache.cache_command_message(message, response)
     
     async def handle_faces(self, message: discord.Message):
@@ -152,5 +155,10 @@ class SimpleOnMessageCog(commands.Cog):
         
     def contains_number(self, string):
         return bool(re.search(self.version_pattern, string))
-
-
+        
+    
+    async def handle_train(self, message: discord.Message):
+        if re.search(r'\btrain\b|\btrains\b', message.content, re.IGNORECASE):
+            return await message.channel.send("All aboard!! CHOO" + ('O' * random.randint(0, 12)) + " CHOOOO"  + ('O' * random.randint(0, 24))) 
+        
+        return False
