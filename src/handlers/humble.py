@@ -82,7 +82,7 @@ class HumbleCog(commands.Cog):
         result = []
         for bundle_type in self.bundle_types:
             if bundle_type in bundles:
-                result.extend([item['machine_name'] for item in bundles[bundle_type]])
+                result.extend([item['product_url'] for item in bundles[bundle_type]])
         return result
 
     @tasks.loop(hours=1)
@@ -96,7 +96,7 @@ class HumbleCog(commands.Cog):
             embeds = []
             for bundle_type, products in bundles.items():
                 for prod in products:
-                    if prod['machine_name'] in new_names:
+                    if prod['product_url'] in new_names:
                         embed = self.product_embed(prod)
                         embed.add_field(name="Category", value=bundle_type.capitalize(), inline=False)
                         embeds.append(embed)

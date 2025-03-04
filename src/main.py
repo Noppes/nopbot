@@ -17,6 +17,7 @@ from handlers.mc import MinecraftCog
 from handlers.humble import HumbleCog
 from handlers.meme import MemeCog
 from handlers.quote import QuoteCog
+from handlers.days import DaysCog
 from handlers.simple_commands import SimpleCommandsCog
 from handlers.simple_onmessage import SimpleOnMessageCog
 
@@ -51,6 +52,7 @@ async def on_ready():
     await client.add_cog(MinecraftCog(client, logger, cache))
     await client.add_cog(HumbleCog(client, logger, cache))
     await client.add_cog(MemeCog(client, logger))
+    await client.add_cog(DaysCog(client, logger, cache))
     await client.add_cog(QuoteCog(client, logger))
     await client.add_cog(SimpleCommandsCog(client, logger, cache))
     await client.add_cog(SimpleOnMessageCog(client, logger, cache))

@@ -15,7 +15,7 @@ class MinecraftCog(commands.Cog):
     def __init__(self, bot, logger, cache):
         self.cache = cache
         self.logger = logger
-        self.channel = bot.get_channel(references.message_mcstatus_channel_id)
+        self.channel = bot.get_channel(references.message_days_channel_id)
         self.prev_status = False
         self.count = 0
         self.date_check.start()
