@@ -35,7 +35,7 @@ class DaysCog(commands.Cog):
                 'desc': 'A day to celebrate the best food!',
             },
             {
-                'date': self._get_date(now, 3, 30),
+                'date': self._get_date(now, 5, 30),
                 'title': 'International Potato Day 🥔🥔',
                 'desc': 'It\'s International Potato Day today, make sure to say thanks to all your local potatos.',
                 'url': 'https://www.fao.org/international-potato-day/en'
