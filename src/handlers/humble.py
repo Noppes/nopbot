@@ -19,6 +19,9 @@ class HumbleCog(commands.Cog):
         self.bundle_types = ['games', 'books', 'software']
         self.availble_bundles = []
         self.bundles_check.start()
+        
+        self.availble_epicgames = []
+        self.epicgames_check.start()
 
     @commands.command()
     async def bundles(self, ctx: commands.context.Context, bundle_type:str = "games"):
@@ -85,6 +88,19 @@ class HumbleCog(commands.Cog):
                 result.extend([item['product_url'] for item in bundles[bundle_type]])
         return result
 
+
+    @commands.command()
+    async def epicgames(self, ctx: commands.context.Context):
+        games = self.get_epicgames()
+        if not games:
+            ctx.channel.send(f"No free epic games found")
+            return True
+        embeds = []
+        for game in games:
+            embeds.append(self.epicgames_embed(game))
+        for i in range(0, len(embeds), 10):
+            await ctx.channel.send(embeds=embeds[i:i + 10]) 
+
     @tasks.loop(hours=1)
     async def bundles_check(self):
         bundles = self.get_bundles()
@@ -107,3 +123,66 @@ class HumbleCog(commands.Cog):
                     message = None
 
         self.availble_bundles = machine_names
+
+    
+    @tasks.loop(hours=1)
+    async def epicgames_check(self): # https://store.epicgames.com/en-US/free-games
+        games = self.get_epicgames()
+        machine_names = list({d["productSlug"] for d in games})
+        if len(games) == 0 or len(machine_names) == 0:
+            return
+        new_names = [item for item in machine_names if item not in self.availble_epicgames]
+        if len(self.availble_epicgames) > 0 and len(new_names) > 0:
+            embeds = []
+            for prod in games:
+                if prod['productSlug'] in new_names:
+                    embed = self.epicgames_embed(prod)
+                    embed.add_field(name="Category", value="Epic Games Store", inline=False)
+                    embeds.append(embed)
+            if len(embeds) > 0:
+                message = f"{len(embeds)} new Epic Store free game:"
+                for i in range(0, len(embeds), 10):
+                    await self.channel.send(content=message, embeds=embeds[i:i + 10]) 
+                    message = None
+
+        self.availble_epicgames = machine_names
+
+        
+
+    def get_epicgames(self):
+        response = requests.get("https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?locale=en-US")
+        if response.status_code != 200:
+            return []
+        games = json.loads(response.text)['data']['Catalog']['searchStore']['elements']
+
+        result = []
+        for game in games:
+            if game['expiryDate'] and game['productSlug']:
+                result.append(game)
+        return result
+
+    def epicgames_embed(self, game) -> discord.Embed:
+        try:
+            embed = discord.Embed(
+                title=game['title'],
+                description=self.format_blurb(game['description']),
+                url="https://store.epicgames.com/en-US/p/" + game['productSlug']
+            )
+            embed.set_image(url=game['keyImages'][0]['url'])
+            start_date = datetime.strptime(game['viewableDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            end_date = datetime.strptime(game['expiryDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            embed.add_field(name="Start Date", value=start_date.strftime("%d-%b-%Y"))
+            embed.add_field(name="End Date", value=end_date.strftime("%d-%b-%Y"))
+            difference = end_date - datetime.utcnow()
+            if difference.days > 1:
+                embed.add_field(name="Countdown", value=f"{difference.days} Days left ")
+            else:
+                total_seconds = difference.total_seconds()
+                hours = int(total_seconds // 3600)
+                minutes = int((total_seconds % 3600) // 60)
+                seconds = int(total_seconds % 60)
+                embed.add_field(name="Countdown", value=f"{hours:02}:{minutes:02}:{seconds:02}")
+            return embed
+        except Exception as e:
+            self.logger.exception(e)
+            self.logger.info(game)
