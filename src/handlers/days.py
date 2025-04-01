@@ -35,13 +35,12 @@ class DaysCog(commands.Cog):
                 'desc': 'A day to celebrate the best food!',
             },
             {
-                'date': self._get_date(now, 5, 30),
-                'title': 'International Potato Day 🥔🥔',
-                'desc': 'It\'s International Potato Day today, make sure to say thanks to all your local potatos.',
-                'url': 'https://www.fao.org/international-potato-day/en'
+                'date': self._get_date(now, 3, 14),
+                'title': 'Pi Day 🥧π',
+                'desc': '3.14159265359',
             },
             {
-                'date': self._get_date(now, 4, 1),
+                'date': self._get_date(now, 4, 11),
                 'title': 'International Pet Day 🐈🐕',
                 'desc': 'Give your pets some extra treats from me!',
             },
@@ -49,6 +48,12 @@ class DaysCog(commands.Cog):
                 'date': self._get_date(now, 6, 18),
                 'title': 'Best Friend Day',
                 'desc': 'Tell your besties you love them!',
+            },
+            {
+                'date': self._get_date(now, 5, 30),
+                'title': 'International Potato Day 🥔🥔',
+                'desc': 'It\'s International Potato Day today, make sure to say thanks to all your local potatos.',
+                'url': 'https://www.fao.org/international-potato-day/en'
             },
             {
                 'date': self._get_date(now, 7, 2),
