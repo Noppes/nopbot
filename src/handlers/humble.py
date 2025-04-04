@@ -128,14 +128,14 @@ class HumbleCog(commands.Cog):
     @tasks.loop(hours=1)
     async def epicgames_check(self): # https://store.epicgames.com/en-US/free-games
         games = self.get_epicgames()
-        machine_names = list({d["id"] for d in games})
+        machine_names = list({d["productSlug"] for d in games})
         if len(games) == 0 or len(machine_names) == 0:
             return
         new_names = [item for item in machine_names if item not in self.availble_epicgames]
         if len(self.availble_epicgames) > 0 and len(new_names) > 0:
             embeds = []
             for prod in games:
-                if prod['id'] in new_names:
+                if prod['productSlug'] in new_names:
                     embed = self.epicgames_embed(prod)
                     embed.add_field(name="Category", value="Epic Games Store", inline=False)
                     embeds.append(embed)
