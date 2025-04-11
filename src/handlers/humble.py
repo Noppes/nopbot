@@ -101,7 +101,7 @@ class HumbleCog(commands.Cog):
         for i in range(0, len(embeds), 10):
             await ctx.channel.send(embeds=embeds[i:i + 10]) 
 
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=12)
     async def bundles_check(self):
         bundles = self.get_bundles()
         machine_names = self.get_names(bundles)
@@ -125,7 +125,7 @@ class HumbleCog(commands.Cog):
         self.availble_bundles = machine_names
 
     
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=12)
     async def epicgames_check(self): # https://store.epicgames.com/en-US/free-games
         games = self.get_epicgames()
         machine_names = list({d["productSlug"] for d in games})
