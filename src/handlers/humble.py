@@ -30,7 +30,7 @@ class HumbleCog(commands.Cog):
 
         bundles = self.get_bundles()
         if bundle_type not in bundles:
-            ctx.channel.send(f"No bundles currently available for `{bundle_type}`")
+            await ctx.channel.send(f"No bundles currently available for `{bundle_type}`")
             return True
         products = bundles[bundle_type]
         embeds = []
@@ -93,7 +93,7 @@ class HumbleCog(commands.Cog):
     async def epicgames(self, ctx: commands.context.Context):
         games = self.get_epicgames()
         if not games:
-            ctx.channel.send(f"No free epic games found")
+            await ctx.channel.send(f"No free epic games found")
             return True
         embeds = []
         for game in games:
@@ -128,14 +128,14 @@ class HumbleCog(commands.Cog):
     @tasks.loop(hours=12)
     async def epicgames_check(self): # https://store.epicgames.com/en-US/free-games
         games = self.get_epicgames()
-        machine_names = list({d["productSlug"] for d in games})
+        machine_names = list({d["id"] for d in games})
         if len(games) == 0 or len(machine_names) == 0:
             return
         new_names = [item for item in machine_names if item not in self.availble_epicgames]
         if len(self.availble_epicgames) > 0 and len(new_names) > 0:
             embeds = []
             for prod in games:
-                if prod['productSlug'] in new_names:
+                if prod['id'] in new_names:
                     embed = self.epicgames_embed(prod)
                     embed.add_field(name="Category", value="Epic Games Store", inline=False)
                     embeds.append(embed)
@@ -157,7 +157,7 @@ class HumbleCog(commands.Cog):
 
         result = []
         for game in games:
-            if game['expiryDate'] and game['productSlug']:
+            if game['offerMappings'] and game['promotions'] and game['promotions']['promotionalOffers']:
                 result.append(game)
         return result
 
@@ -166,11 +166,11 @@ class HumbleCog(commands.Cog):
             embed = discord.Embed(
                 title=game['title'],
                 description=self.format_blurb(game['description']),
-                url="https://store.epicgames.com/en-US/p/" + game['productSlug']
+                url="https://store.epicgames.com/en-US/p/" + game['offerMappings'][0]['pageSlug']
             )
             embed.set_image(url=game['keyImages'][0]['url'])
-            start_date = datetime.strptime(game['viewableDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
-            end_date = datetime.strptime(game['expiryDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            start_date = datetime.strptime(game['promotions']['promotionalOffers'][0]['promotionalOffers'][0]['startDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
+            end_date = datetime.strptime(game['promotions']['promotionalOffers'][0]['promotionalOffers'][0]['endDate'], "%Y-%m-%dT%H:%M:%S.%fZ")
             embed.add_field(name="Start Date", value=start_date.strftime("%d-%b-%Y"))
             embed.add_field(name="End Date", value=end_date.strftime("%d-%b-%Y"))
             difference = end_date - datetime.utcnow()
