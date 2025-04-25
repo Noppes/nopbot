@@ -8,7 +8,7 @@ import json
 import io
 
 from dateutil.relativedelta import relativedelta
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 from bs4 import BeautifulSoup
 
 import lunardate
@@ -29,6 +29,8 @@ class DaysCog(commands.Cog):
         dates = [
             self.chinese_new_year(now.date()),
             self.hanukkah(now.date()),
+            self.international_fathersday(now.date()),
+            self.international_mothersday(now.date()),
             {
                 'date': self._get_date(now, 2, 9),
                 'title': 'World Pizza Day 🍕🧑‍🍳',
@@ -45,11 +47,6 @@ class DaysCog(commands.Cog):
                 'desc': 'Give your pets some extra treats from me!',
             },
             {
-                'date': self._get_date(now, 6, 18),
-                'title': 'Best Friend Day',
-                'desc': 'Tell your besties you love them!',
-            },
-            {
                 'date': self._get_date(now, 5, 30),
                 'title': 'International Potato Day 🥔🥔',
                 'desc': 'It\'s International Potato Day today, make sure to say thanks to all your local potatos.',
@@ -59,6 +56,11 @@ class DaysCog(commands.Cog):
                 'date': self._get_date(now, 7, 2),
                 'title': 'World UFO Day 👽🛸',
                 'desc': 'Never stop believing! They are out there!',
+            },
+            {
+                'date': self._get_date(now, 7, 30),
+                'title': 'International Day Of Friendship 🫂',
+                'desc': 'Tell your besties you love them!',
             },
             {
                 'date': self._get_date(now, 8, 8),
@@ -120,7 +122,7 @@ class DaysCog(commands.Cog):
 
     @tasks.loop(seconds=60)
     async def date_check(self):
-        now = datetime.utcnow() - timedelta(hours=10)
+        now = datetime.now(timezone.utc) - timedelta(hours=10)
         if not self.lastcheck or now.day == self.lastcheck.day:
             self.lastcheck = now
             return
@@ -170,6 +172,42 @@ class DaysCog(commands.Cog):
                 'date': hanukkah_start,
                 'title': 'Hanukkah 🕎✡️',
                 'desc': f'Happy Hanukkah!'
+                }
+
+    def international_mothersday(self, now):
+        year = now.year
+        day = date(year, 5, 1)
+        days_until_sunday = (6 - day.weekday()) % 7
+        second_sunday = day + timedelta(days=days_until_sunday + 7)
+
+        if second_sunday < now:
+            year += 1
+            day = date(year, 5, 1)
+            days_until_sunday = (6 - day.weekday()) % 7
+            second_sunday = day + timedelta(days=days_until_sunday + 7)
+
+        return {
+                'date': second_sunday,
+                'title': 'International Mothers Day 👩👵',
+                'desc': f'Happy International Mothers Day! Give your mother some thanks or I can do it for you tonight 🤖'
+                }
+
+    def international_fathersday(self, now):
+        year = now.year
+        day = date(year, 6, 1)
+        days_until_sunday = (6 - day.weekday()) % 7
+        third_sunday = day + timedelta(days=days_until_sunday + 14)
+
+        if third_sunday < now:
+            year += 1
+            day = date(year, 6, 1)
+            days_until_sunday = (6 - day.weekday()) % 7
+            third_sunday = day + timedelta(days=days_until_sunday + 14)
+
+        return {
+                'date': third_sunday,
+                'title': 'International Fathers Day 👨👴',
+                'desc': f'Happy International Fathers Day! If you still have one, otherwise just give your thanks to me, your daddy 🤖.'
                 }
 
     # def vikram_samvat(self, now):
